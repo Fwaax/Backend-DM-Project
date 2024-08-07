@@ -27,3 +27,16 @@ const schema = new Schema({
 });
 
 export const User = mongoose.model("users", schema);
+
+// TODO: add new schemas for name and address and image
+
+// Define a schema for nested subdocuments
+// const nestedSchema = new mongoose.Schema({
+//     detail: String
+// }, { _id: true }); // Ensure _id is included
+
+// Define a parent schema
+// const parentSchema = new mongoose.Schema({
+//     name: String,
+//     nestedObjects: [nestedSchema] // Array of nested subdocuments
+// });
