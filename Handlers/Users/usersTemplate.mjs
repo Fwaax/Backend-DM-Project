@@ -23,6 +23,10 @@ const schema = new Schema({
         zip: Number,
     },
     isBusiness: Boolean,
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
     createdAt: Date,
 });
 

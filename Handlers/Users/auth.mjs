@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { JWT_SECRET } from "../../config.mjs";
 import { EMAIL_REGEX, HTTPS_REGEX, PASSWORD_REGEX, UserValidationJoi, LoginValidationJoi } from "../Joi/UserValidationJoi.mjs";
 import { json } from "express";
+import jwt from 'jsonwebtoken';
 
 
 // Login (POST) -----
@@ -27,8 +28,21 @@ app.post("/login", async (req, res) => {
         return res.status(403).send("email or password is incorrect");
     }
 
-    req.session.user = user;
-    res.send(user);
+    // req.session.user = user;
+
+    const token = jwt.sign({
+        _id: user._id,
+        firstName: user.name.firstName,
+        middleName: user.name.middleName,
+        lastName: user.name.lastName,
+        email: user.email,
+        isBusiness: user.isBusiness,
+        isAdmin: user.isAdmin,
+    }, JWT_SECRET, { expiresIn: '1h' });
+
+    res.send(token);
+
+    // res.send(user);
 });
 
 app.post("/signup", async (req, res) => {
@@ -46,9 +60,6 @@ app.post("/signup", async (req, res) => {
     // Check if email is valid
 
     const responseJson = req.body;
-    console.log(responseJson);
-    console.log(responseJson["name"]);
-
 
     const email = responseJson.email;
     const password = responseJson.password;
@@ -67,7 +78,6 @@ app.post("/signup", async (req, res) => {
     const zip = responseJson.address.zip;
     const isBusiness = responseJson.isBusiness;
 
-    console.log(email, EMAIL_REGEX.test(email));
 
     if (!EMAIL_REGEX.test(email)) {
         return res.status(400).send("Invalid email");
@@ -115,7 +125,6 @@ app.post("/signup", async (req, res) => {
     const newUser = await user.save();
     res.send(newUser);
 });
-
 
 
 app.post("/logout", (req, res) => {
