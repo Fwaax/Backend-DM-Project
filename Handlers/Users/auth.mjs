@@ -1,10 +1,10 @@
 import { app } from "../../app.mjs";
 import { User } from "./usersTemplate.mjs";
 import bcrypt from 'bcrypt';
-import { JWT_SECRET } from "../../config.mjs";
 import { EMAIL_REGEX, HTTPS_REGEX, PASSWORD_REGEX, UserValidationJoi, LoginValidationJoi } from "../Joi/UserValidationJoi.mjs";
 import { json } from "express";
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
 
 // Login (POST) -----
@@ -38,11 +38,9 @@ app.post("/login", async (req, res) => {
         email: user.email,
         isBusiness: user.isBusiness,
         isAdmin: user.isAdmin,
-    }, JWT_SECRET, { expiresIn: '1h' });
+    }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.send(token);
-
-    // res.send(user);
 });
 
 app.post("/signup", async (req, res) => {

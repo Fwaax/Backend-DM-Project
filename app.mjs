@@ -2,11 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import session from 'express-session';
+import dotenv from 'dotenv';
 
-const PORT = 6969;
+dotenv.config();
+
+const PORT = process.env.PORT;
+
+// process.env.PORT
 
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/Ryan-MongoDB-Project');
+    await mongoose.connect(process.env.DB_URL);
     console.log('mongodb connection established on port 27017');
 }
 
