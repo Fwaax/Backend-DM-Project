@@ -33,11 +33,11 @@ app.post("/login", async (req, res) => {
     const token = jwt.sign({
         _id: user._id,
         firstName: user.name.firstName,
-        middleName: user.name.middleName,
-        lastName: user.name.lastName,
-        email: user.email,
-        isBusiness: user.isBusiness,
-        isAdmin: user.isAdmin,
+        // middleName: user.name.middleName,
+        // lastName: user.name.lastName,
+        // email: user.email,
+        // isBusiness: user.isBusiness,
+        // isAdmin: user.isAdmin,
     }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.send(token);
@@ -49,13 +49,6 @@ app.post("/signup", async (req, res) => {
     if (validate.error) {
         return res.status(403).send(validate.error.details[0].message);
     }
-
-    // for (const [key, value] of Object.entries(requiredFields)) {
-    //     if (!value) {
-    //         return res.status(400).send(`Missing field: ${key}`);
-    //     }
-    // }
-    // Check if email is valid
 
     const responseJson = req.body;
 
@@ -76,6 +69,9 @@ app.post("/signup", async (req, res) => {
     const zip = responseJson.address.zip;
     const isBusiness = responseJson.isBusiness;
 
+    if (responseJson.isAdmin) {
+        return res.status(400).send("Admin cannot be created");
+    }
 
     if (!EMAIL_REGEX.test(email)) {
         return res.status(400).send("Invalid email");
@@ -123,9 +119,3 @@ app.post("/signup", async (req, res) => {
     const newUser = await user.save();
     res.send(newUser);
 });
-
-
-app.post("/logout", (req, res) => {
-    delete req.session.user;
-    res.end();
-})

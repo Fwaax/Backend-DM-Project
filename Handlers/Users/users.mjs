@@ -1,15 +1,16 @@
 import { app } from "../../app.mjs";
+import { adminGuard, guard, adminGuard } from "../../guard.mjs";
 import { User } from "./usersTemplate.mjs";
 
 
 // Change isBusiness status (POST) ------
 // Edit user info (PUT)
 
-app.get("/users", async (req, res) => {
+app.get("/users", adminGuard, async (req, res) => {
     res.send(await User.find());
 });
 
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id", adminGuard, async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
@@ -51,6 +52,7 @@ app.post("/users", async (req, res) => {
     res.send(newUser);
 });
 
+// Edit user info (PUT)
 app.put("/users/:id", async (req, res) => {
     const {
         name: { firstName, middleName, lastName },
