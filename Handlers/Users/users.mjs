@@ -1,5 +1,5 @@
 import { app } from "../../app.mjs";
-import { adminGuard, guard, adminGuard } from "../../guard.mjs";
+import { adminGuard } from "../../guard.mjs";
 import { User } from "./usersTemplate.mjs";
 
 
@@ -11,46 +11,18 @@ app.get("/users", adminGuard, async (req, res) => {
 });
 
 app.get("/users/:id", adminGuard, async (req, res) => {
-    const user = await User.findById(req.params.id);
+    const user = await User.findOne({ _id: req.params.id }, '-password');
+
+
+    const reqUser = req.user;
 
     if (!user) {
         return res.status(403).send({ message: "User not found" });
     }
-
-    res.send(user);
+    const data = { message: `Hello ${reqUser.name.firstName}`, data: user };
+    res.send(data);
 });
 
-// I think I copied this by mistake
-app.post("/users", async (req, res) => {
-    const user = new User({
-        name: {
-            firstName: req.body.firstName,
-            middleName: req.body.middleName,
-            lastName: req.body.lastName
-        },
-        email: req.body.email,
-        password: req.body.password,
-        web: req.body.web,
-        phone: req.body.phone,
-        image: {
-            url: req.body.url,
-            alt: req.body.alt
-        },
-        address: {
-            state: req.body.state,
-            city: req.body.city,
-            country: req.body.country,
-            street: req.body.street,
-            houseNumber: req.body.houseNumber,
-            zip: req.body.zip
-        },
-        isBusiness: req.body.isBusiness
-    });
-
-    const newUser = await user.save();
-
-    res.send(newUser);
-});
 
 // Edit user info (PUT)
 app.put("/users/:id", async (req, res) => {

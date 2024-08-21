@@ -7,10 +7,6 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 
-// Login (POST) -----
-// Signup (POST) -----
-// Logout (POST) -----
-
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -28,16 +24,9 @@ app.post("/login", async (req, res) => {
         return res.status(403).send("email or password is incorrect");
     }
 
-    // req.session.user = user;
-
     const token = jwt.sign({
         _id: user._id,
         firstName: user.name.firstName,
-        // middleName: user.name.middleName,
-        // lastName: user.name.lastName,
-        // email: user.email,
-        // isBusiness: user.isBusiness,
-        // isAdmin: user.isAdmin,
     }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.send(token);

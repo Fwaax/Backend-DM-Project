@@ -1,78 +1,44 @@
 import jwt from 'jsonwebtoken';
+import { User } from './Handlers/Users/usersTemplate.mjs';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const guard = (req, res, next) => {
-    jwt.verify(req.headers.authorization, JWT_SECRET, (err, data) => {
-        if (err) {
-            res.status(401).send('User is not authorized');
-        } else {
-            next();
-        }
-    });
-};
+export const adminGuard = async (req, res, next) => {
+    const token = req.headers.authorization;
 
-export const adminGuard = (req, res, next) => {
-    jwt.verify(req.headers.authorization, JWT_SECRET, (err, data) => {
-        if (err) {
-            res.status(401).send('An error occured.');
-            return; // <-----
+    if (!token) {
+        return res.status(401).send('No token provided');
+    }
+
+    try {
+        // Verify the token and extract the user ID
+        const data = jwt.verify(token, JWT_SECRET);
+        const userId = data._id;
+
+        // Look up the user in the database
+        // const users = await User.find({ _id: userId }).select('-password');
+        // const user = users[0];
+        const user = await User.findOne({ _id: userId }, '-password');
+
+
+        if (!user) {
+            return res.status(404).send('User not found');
         }
 
-        if (!data.isAdmin && data._id !== req.params.id) {
-            res.status(401).send('User is not authorized');
-            return; // <-----
+        // Store the user object in req.user for further use
+        req.user = user;
+        console.log(user);
+        console.log(user._id);
+
+        // Check if the user is authorized (either an admin or the user with the matching _id)
+        if (!user.isAdmin && user._id.toString() !== req.params.id) {
+            return res.status(401).send('User is not authorized');
         }
 
+        // Proceed to the next middleware
         next();
-    });
+    } catch (err) {
+        console.error(err);
+        return res.status(401).send('Invalid token');
+    }
 }
-
-// export const adGuard = (req, res, next) => {
-//     jwt.verify(req.headers.authorization, JWT_SECRET, (err, data) => {
-
-//         if (data.isAdmin || data._id === req.params.id) {
-//             if (err) {
-//                 res.status(401).send('User is not authorized');
-//             } else {
-//                 next();
-//             }
-//         }
-//         else {
-//             res.status(401).send('User is not authorized');
-//         }
-//     });
-// }
-
-// export const adminGuard = (req, res, next) => {
-//     const user = getUser(req);
-//     if (user.isAdmin) {
-//         next();
-//     } else {
-//         res.status(401).send('User is not authorized');
-//     }
-// };
-
-// export const getUser = req => {
-//     if (!req.headers.authorization) {
-//         return null;
-//     }
-
-//     const user = jwt.decode(req.headers.authorization, process.env.JWT_SECRET);
-
-//     if (!user) {
-//         return null;
-//     }
-
-//     return user;
-// }
-
-// export const bussinessGuard = (req, res, next) => {
-//     const user = getUser(req);
-
-//     if (user?.isBusiness || user?.isAdmin) {
-//         next();
-//     } else {
-//         res.status(401).send('User is not authorized');
-//     }
-// };
