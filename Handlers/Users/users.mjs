@@ -2,18 +2,12 @@ import { app } from "../../app.mjs";
 import { adminGuard } from "../../guard.mjs";
 import { User } from "./usersTemplate.mjs";
 
-
-// Change isBusiness status (POST) ------
-// Edit user info (PUT)
-
 app.get("/users", adminGuard, async (req, res) => {
     res.send(await User.find());
 });
 
 app.get("/users/:id", adminGuard, async (req, res) => {
     const user = await User.findOne({ _id: req.params.id }, '-password');
-
-
     const reqUser = req.user;
 
     if (!user) {
@@ -22,7 +16,6 @@ app.get("/users/:id", adminGuard, async (req, res) => {
     const data = { message: `Hello ${reqUser.name.firstName}`, data: user };
     res.send(data);
 });
-
 
 // Edit user info (PUT)
 app.put("/users/:id", async (req, res) => {

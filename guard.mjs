@@ -3,6 +3,31 @@ import { User } from './Handlers/Users/usersTemplate.mjs';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// export const guard = async (req, res, next) => {
+//     const token = req.headers.authorization;
+
+//     if (!token) {
+//         return res.status(401).send('No token provided');
+//     }
+
+//     try {
+//         const user = await User.findOne({ _id })
+
+//         if (!user) {
+//             return res.status(404).send('User not found');
+//         }
+//         if (!user.isAdmin) {
+//             return res.status(401).send('User is not authorized');
+//         }
+
+//         next();
+//     }
+//     catch (err) {
+//         console.error(err);
+//         return res.status(401).send('Invalid token');
+//     }
+// }
+
 export const adminGuard = async (req, res, next) => {
     const token = req.headers.authorization;
 
@@ -36,6 +61,60 @@ export const adminGuard = async (req, res, next) => {
         }
 
         // Proceed to the next middleware
+        next();
+    } catch (err) {
+        console.error(err);
+        return res.status(401).send('Invalid token');
+    }
+}
+
+export const userCardGuard = async (req, res, next) => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).send('No token provided');
+    }
+
+    try {
+        // Verify the token and extract the user ID
+        const data = jwt.verify(token, JWT_SECRET);
+        const userId = data._id;
+
+        const user = await User.findOne({ _id: userId }, '-password');
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        req.user = user;
+        next();
+    } catch (err) {
+        console.error(err);
+        return res.status(401).send('Invalid token');
+    }
+}
+
+export const userBusinessGuard = async (req, res, next) => {
+    const token = req.headers.authorization;
+
+    if (!token) {
+        return res.status(401).send('No token provided');
+    }
+
+    try {
+        // Verify the token and extract the user ID
+        const data = jwt.verify(token, JWT_SECRET);
+        const userId = data._id;
+
+        const user = await User.findOne({ _id: userId }, '-password');
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        if (!user.isBusiness) {
+            return res.status(401).send('User is not authorized');
+        }
+        req.user = user;
         next();
     } catch (err) {
         console.error(err);

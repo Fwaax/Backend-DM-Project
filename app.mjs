@@ -48,3 +48,4 @@ app.get('/', (req, res) => {
 
 import("./Handlers/Users/auth.mjs");
 import("./Handlers/Users/users.mjs");
+import("./Handlers/Cards/cards.mjs");

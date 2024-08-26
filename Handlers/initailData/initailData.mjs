@@ -35,7 +35,8 @@ export const initailDataUsers = [
         },
         phone: "0123456789",
         email: "theEmail@email.com",
-        password: "$2b$10$QTmVZ68o65dgjrgB4ruSq.qzvdVVFYcHlp9b6HnBkSAt5bX2qOONq",
+        password: "$2b$10$QTmVZ68o65dgjrgB4ruSq.qzvdVVFYcHlp9b6HnBkSAt5bX2qOONq" // asdASD1!
+        ,
         web: "https://www.4kSexyCosplayerImgs.com",
         image: {
             url: "https://images.pexels.com/photos/27498297/pexels-photo-27498297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
