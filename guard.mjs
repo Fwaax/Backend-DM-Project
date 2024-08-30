@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { User } from './Handlers/Users/usersTemplate.mjs';
+import dotenv from 'dotenv';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -116,6 +117,34 @@ export const userBusinessGuard = async (req, res, next) => {
         }
         req.user = user;
         next();
+    } catch (err) {
+        console.error(err);
+        return res.status(401).send('Invalid token');
+    }
+}
+
+export const deleteGuard = async (req, res, next) => {
+    const token = req.headers.authorization;
+    if (!token) {
+        return res.status(401).send('No token provided');
+    }
+
+    try {
+        // Verify the token and extract the user ID
+        const data = jwt.verify(token, JWT_SECRET);
+        const userId = data._id;
+
+        const user = await User.findOne({ _id: userId }, '-password');
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        if (user.isAdmin || req.body._id === userId) {
+            next();
+            return
+        }
+        return res.status(401).send('User is not authorized');
+
     } catch (err) {
         console.error(err);
         return res.status(401).send('Invalid token');

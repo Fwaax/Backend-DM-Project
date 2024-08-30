@@ -30,7 +30,7 @@ const cardSchema = new Schema({
     image: { type: ImageSchema, required: true },
     address: { type: AddressSchema, required: true },
     bizNumber: { type: Number, required: true },
-    likes: { type: [LikeSchema], required: true },
+    likes: { type: [String], required: true },
     createdByUserId: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
     createdAt: { type: Date, default: Date.now },
 });
