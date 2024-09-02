@@ -50,7 +50,7 @@ export const LoginValidationJoi = Joi.object({
 
 
 // Card joi
-export const cardValidationSchema = Joi.object({
+export const cardValidationCreationJoi = Joi.object({
     title: Joi.string().min(2).max(30).required(),
     subtitle: Joi.string().min(2).max(30).required(),
     description: Joi.string().min(2).max(60).required(),
@@ -77,3 +77,25 @@ export const cardValidationSchema = Joi.object({
 });
 
 
+export const cardValidationEditJoi = Joi.object({
+    title: Joi.string().min(2).max(30).optional(),
+    subtitle: Joi.string().min(2).max(30).optional(),
+    description: Joi.string().min(2).max(60).optional(),
+    phone: Joi.string().pattern(/^[+]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/).optional(),  // Matches various phone number formats
+    email: Joi.string().email().optional(),
+    web: Joi.string().uri({ scheme: ['https'] }).optional(),
+
+    image: Joi.object({
+        url: Joi.string().uri().optional(),
+        alt: Joi.string().optional(),
+    }),
+
+    address: Joi.object({
+        state: Joi.string().optional(),
+        city: Joi.string().optional(),
+        country: Joi.string().optional(),
+        street: Joi.string().optional(),
+        houseNumber: Joi.number().optional(),
+        zip: Joi.number().optional(),
+    }),
+});

@@ -2,7 +2,7 @@ import { app } from "../../app.mjs";
 import { Card, validateRequiredFields } from "./cardsTemplate.mjs";
 import { userCardGuard, userBusinessGuard, deleteGuard } from "../../guard.mjs";
 import crypto from 'crypto';
-import { cardValidationSchema } from "../Joi/UserValidationJoi.mjs";
+import { cardValidationCreationJoi, cardValidationEditJoi } from "../Joi/UserValidationJoi.mjs";
 
 app.get("/cards", async (req, res) => {
     res.send(await Card.find());
@@ -35,7 +35,7 @@ app.post("/cards", userBusinessGuard, async (req, res) => {
     // req.body.bizNumber = Math.floor(Math.random() * 1000000000);
 
 
-    const validate = cardValidationSchema.validate(req.body, { allowUnknown: false });
+    const validate = cardValidationCreationJoi.validate(req.body, { allowUnknown: false });
     if (validate.error) {
         return res.status(400).send(validate.error.details[0].message);
     }
@@ -75,16 +75,21 @@ app.patch("/cards/:id", userBusinessGuard, async (req, res) => {
 
 // Edit
 app.put("/cards/:id", userBusinessGuard, async (req, res) => {
-    const card = await Card.findOne({ _id: req.params.id });
-    if (!card) {
+    const validate = cardValidationEditJoi.validate(req.body, { allowUnknown: false });
+    if (validate.error) {
+        return res.status(400).send(validate.error.details[0].message);
+    }
+    const cardDoc = await Card.findOne({ _id: req.params.id });
+    if (!cardDoc) {
         return res.status(404).send("Card not found");
     }
+    const newEditedCard = { ...cardDoc.toObject({ flattenMaps: true }), ...req.body };
 
     // const errormsg = validateRequiredFields(req.body);
     // if (errormsg) return res.status(400).send(errormsg);
-    card.set(req.body);
-    await card.save();
-    res.send(card);
+    cardDoc.set(newEditedCard);
+    await cardDoc.save();
+    res.send(cardDoc);
 });
 
 app.delete("/cards/:id", deleteGuard, async (req, res) => { // Need new guard for admin and creator
