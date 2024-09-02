@@ -1,6 +1,8 @@
 import { app } from "../../app.mjs";
 import { Card, validateRequiredFields } from "./cardsTemplate.mjs";
 import { userCardGuard, userBusinessGuard, deleteGuard } from "../../guard.mjs";
+import crypto from 'crypto';
+import { cardValidationSchema } from "../Joi/UserValidationJoi.mjs";
 
 app.get("/cards", async (req, res) => {
     res.send(await Card.find());
@@ -17,16 +19,35 @@ app.get("/cards/my-cards", userCardGuard, async (req, res) => { // Need guard he
 });
 
 app.post("/cards", userBusinessGuard, async (req, res) => {
-    req.body.createdByUserId = req.user._id;
-    req.body.createdAt = new Date();
-    req.body.bizNumber = Math.floor(Math.random() * 1000000000);
-    let bizNumCard = await Card.findOne({ bizNumber: req.body.bizNumber });
-    while (bizNumCard) {
-        req.body.bizNumber = Math.floor(Math.random() * 1000000000);
-        bizNumCard = await Card.findOne({ bizNumber: req.body.bizNumber });
+    if (req.body.createdByUserId) {
+        return res.status(400).send("You cannot insert 'createdByUserId' field");
     }
-    const errormsg = validateRequiredFields(req.body);
-    if (errormsg) return res.status(400).send(errormsg);
+    if (req.body.bizNumber) {
+        return res.status(400).send("You cannot insert 'bizNumber' field");
+    }
+    if (req.body.createdAt) {
+        return res.status(400).send("You cannot insert 'createdAt' field");
+    }
+    req.body.createdByUserId = req.user._id;
+
+    req.body.createdAt = new Date();
+    req.body.bizNumber = crypto.randomInt(0, 281474976710655);
+    // req.body.bizNumber = Math.floor(Math.random() * 1000000000);
+
+
+    const validate = cardValidationSchema.validate(req.body, { allowUnknown: false });
+    if (validate.error) {
+        return res.status(400).send(validate.error.details[0].message);
+    }
+
+    // let bizNumCard = await Card.findOne({ bizNumber: req.body.bizNumber });
+    // while (bizNumCard) {
+    //     req.body.bizNumber = Math.floor(Math.random() * 1000000000);
+    //     bizNumCard = await Card.findOne({ bizNumber: req.body.bizNumber });
+    // }
+
+
+
     const card = new Card(req.body);
     await card.save();
     res.send(card);
@@ -58,6 +79,7 @@ app.put("/cards/:id", userBusinessGuard, async (req, res) => {
     if (!card) {
         return res.status(404).send("Card not found");
     }
+
     // const errormsg = validateRequiredFields(req.body);
     // if (errormsg) return res.status(400).send(errormsg);
     card.set(req.body);
