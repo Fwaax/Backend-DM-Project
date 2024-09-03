@@ -3,6 +3,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import session from 'express-session';
 import dotenv from 'dotenv';
+import initailDataProc from './Handlers/initailData/initailDataProc.mjs';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ const PORT = process.env.PORT;
 async function main() {
     await mongoose.connect(process.env.DB_URL);
     console.log('mongodb connection established on port 27017');
+    initailDataProc();
 }
 
 main().catch(err => console.log(err));

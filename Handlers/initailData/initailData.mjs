@@ -7,7 +7,8 @@ export const initailDataUsers = [
         },
         phone: "4567891230",
         email: "Med@er.com",
-        password: "$2b$10$90/eMFXPgFAJgUj9l.lMEeLcuNbW1s2zGgLP3HegT9VswrfD5XVcW" // Int3RRp7!
+        password: "Int3RRp7!"
+        // password: "$2b$10$90/eMFXPgFAJgUj9l.lMEeLcuNbW1s2zGgLP3HegT9VswrfD5XVcW" // Int3RRp7!
         ,
         web: "https://www.8kSexyCosplayerImgs.com",
         image: {
@@ -35,7 +36,8 @@ export const initailDataUsers = [
         },
         phone: "0123456789",
         email: "theEmail@email.com",
-        password: "$2b$10$QTmVZ68o65dgjrgB4ruSq.qzvdVVFYcHlp9b6HnBkSAt5bX2qOONq" // asdASD1!
+        password: "asdASD1!"
+        // password: "$2b$10$QTmVZ68o65dgjrgB4ruSq.qzvdVVFYcHlp9b6HnBkSAt5bX2qOONq" // asdASD1!
         ,
         web: "https://www.4kSexyCosplayerImgs.com",
         image: {
@@ -62,7 +64,8 @@ export const initailDataUsers = [
         },
         phone: "8472518594",
         email: "TheVeryThing@Heya.com",
-        password: "$2b$10$yYlEq8O.zJ.cxDLkUjwIi.KzlJaWqs1n4d8NHtn2jBl72JdTm2O7e" // asdASD1!
+        password: "asdASD1!"
+        // password: "$2b$10$yYlEq8O.zJ.cxDLkUjwIi.KzlJaWqs1n4d8NHtn2jBl72JdTm2O7e" // asdASD1!
         ,
         web: "https://www.16kSexyCosplayerImgs.com",
         image: {

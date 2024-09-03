@@ -29,7 +29,6 @@ app.post("/cards", userBusinessGuard, async (req, res) => {
         return res.status(400).send("You cannot insert 'createdAt' field");
     }
     req.body.createdByUserId = req.user._id;
-
     req.body.createdAt = new Date();
     req.body.bizNumber = crypto.randomInt(0, 281474976710655);
     // req.body.bizNumber = Math.floor(Math.random() * 1000000000);
