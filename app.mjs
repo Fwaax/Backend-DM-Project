@@ -21,11 +21,10 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 
-// process.env.PORT
-
+// Initialize MongoDB connection
 async function main() {
     await mongoose.connect(process.env.DB_URL);
-    console.log('mongodb connection established on port 27017');
+    console.log('MongoDB connection established on port 27017');
     initailDataProc();
 }
 
@@ -33,6 +32,7 @@ main().catch(err => console.log(err));
 
 export const app = express();
 
+// Setup request logging using Morgan with chalk for colorization
 app.use(morgan((tokens, req, res) => {
     const status = tokens.status(req, res);
     const method = tokens.method(req, res);
@@ -40,38 +40,25 @@ app.use(morgan((tokens, req, res) => {
     const responseTime = tokens['response-time'](req, res);
     const contentLength = tokens.res(req, res, 'content-length') || '0';
 
-    // Colorize different parts of the log using chalk
-    const coloredStatus = status >= 500
-        ? chalk.red(status)
-        : status >= 400
-            ? chalk.yellow(status)
-            : status >= 300
-                ? chalk.cyan(status)
-                : chalk.green(status);
+    const coloredStatus = status >= 500 ? chalk.red(status) :
+        status >= 400 ? chalk.yellow(status) :
+            status >= 300 ? chalk.cyan(status) : chalk.green(status);
 
-    const coloredMethod = chalk.blue(method);
-    const coloredUrl = chalk.magenta(url);
-    const coloredResponseTime = chalk.white(`${responseTime} ms`);
-    const coloredContentLength = chalk.gray(`${contentLength} bytes`);
-
-    // Return the formatted log string with color
     return [
-        coloredMethod,
-        coloredUrl,
+        chalk.blue(method),
+        chalk.magenta(url),
         coloredStatus,
-        coloredContentLength,
+        chalk.gray(`${contentLength} bytes`),
         '-',
-        coloredResponseTime,
-        chalk.greenBright(new Date().toString()) // Add the timestamp
+        chalk.white(`${responseTime} ms`),
+        chalk.greenBright(new Date().toString())
     ].join(' ');
 }));
 
-
-
-
-
+// Middleware for JSON body parsing
 app.use(express.json());
 
+// Session management
 app.use(session({
     secret: 'cat',
     name: 'full-stack-session',
@@ -79,6 +66,7 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+// CORS settings
 app.use(cors({
     origin: true,
     credentials: true,
@@ -86,32 +74,26 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Accept, Authorization',
 }));
 
-app.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`);
-});
+// API Endpoints
+app.use('/', authRoutes);   // Auth-related routes
+app.use('/', userRoutes);   // User-related routes
+app.use('/', cardRoutes);   // Card-related routes
 
-app.get('/', (req, res) => {
-    res.send({
-        user: req.session.user,
-        message: "Welcome to MongoDB!",
-    });
-});
-
-
-// Serve static files from the 'public' folder
+// Serve static files from 'public' folder when no API matches
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route unsupported endpoints to public files if they exist
+// Handle API and static file requests
 app.use((req, res, next) => {
+    // If no route matches, check for static files
     const filePath = path.join(__dirname, 'public', req.url);
 
-    // Check if the requested file exists in the 'public' directory
+    // Check if the requested file exists
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
             // If the file exists, serve it
             res.sendFile(filePath);
         } else {
-            // If the file does not exist, return a 404 error
+            // If file does not exist, return 404
             res.status(404).send({
                 error: "Not Found",
                 message: "The requested resource was not found on this server."
@@ -120,12 +102,7 @@ app.use((req, res, next) => {
     });
 });
 
-
-// import("./Handlers/Users/auth.mjs");
-// import("./Handlers/Users/users.mjs");
-// import("./Handlers/Cards/cards.mjs");
-
-
-app.use('/', authRoutes);   // All auth-related routes
-app.use('/', userRoutes);  // All user-related routes
-app.use('/', cardRoutes);  // All card-related routes
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});
