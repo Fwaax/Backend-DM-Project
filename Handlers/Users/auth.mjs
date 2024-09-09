@@ -6,8 +6,12 @@ import { json } from "express";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
+import express from "express";
 
-app.post("/login", async (req, res) => {
+const router = express.Router()
+
+
+router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -32,7 +36,7 @@ app.post("/login", async (req, res) => {
     res.send(token);
 });
 
-app.post("/signup", async (req, res) => {
+router.post("/signup", async (req, res) => {
     const validate = UserValidationJoi.validate(req.body, { allowUnknown: false });
 
     if (validate.error) {
@@ -108,3 +112,5 @@ app.post("/signup", async (req, res) => {
     const newUser = await user.save();
     res.send(newUser);
 });
+
+export default router;

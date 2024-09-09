@@ -4,21 +4,25 @@ import { userCardGuard, userBusinessGuard, deleteGuard } from "../../guard.mjs";
 import crypto from 'crypto';
 import { cardValidationCreationJoi, cardValidationEditJoi } from "../Joi/UserValidationJoi.mjs";
 
-app.get("/cards", async (req, res) => {
+import express from "express";
+
+const router = express.Router()
+
+router.get("/cards", async (req, res) => {
     res.send(await Card.find());
 });
 
 
-app.get("/cards/:id", async (req, res) => {
+router.get("/cards/:id", async (req, res) => {
     const card = await Card.findOne({ _id: req.params.id });
     res.send(card);
 });
 
-app.get("/cards/my-cards", userCardGuard, async (req, res) => { // Need guard here for user id check
+router.get("/cards/my-cards", userCardGuard, async (req, res) => { // Need guard here for user id check
     res.send(await Card.find({ createdBy: req.user._id }));
 });
 
-app.post("/cards", userBusinessGuard, async (req, res) => {
+router.post("/cards", userBusinessGuard, async (req, res) => {
     if (req.body.createdByUserId) {
         return res.status(400).send("You cannot insert 'createdByUserId' field");
     }
@@ -53,7 +57,7 @@ app.post("/cards", userBusinessGuard, async (req, res) => {
 });
 
 // Like and dislike array
-app.patch("/cards/:id", userBusinessGuard, async (req, res) => {
+router.patch("/cards/:id", userBusinessGuard, async (req, res) => {
     const card = await Card.findOne({ _id: req.params.id });
     if (!card) {
         return res.status(404).send("Card not found");
@@ -73,7 +77,7 @@ app.patch("/cards/:id", userBusinessGuard, async (req, res) => {
 });
 
 // Edit
-app.put("/cards/:id", userBusinessGuard, async (req, res) => {
+router.put("/cards/:id", userBusinessGuard, async (req, res) => {
     const validate = cardValidationEditJoi.validate(req.body, { allowUnknown: false });
     if (validate.error) {
         return res.status(400).send(validate.error.details[0].message);
@@ -91,7 +95,7 @@ app.put("/cards/:id", userBusinessGuard, async (req, res) => {
     res.send(cardDoc);
 });
 
-app.delete("/cards/:id", deleteGuard, async (req, res) => { // Need new guard for admin and creator
+router.delete("/cards/:id", deleteGuard, async (req, res) => { // Need new guard for admin and creator
     const card = await Card.findOne({ _id: req.params.id });
     if (!card) {
         return res.status(404).send("Card not found");
@@ -100,3 +104,5 @@ app.delete("/cards/:id", deleteGuard, async (req, res) => { // Need new guard fo
     await Card.deleteOne({ _id: req.params.id });
     res.send(card);
 });
+
+export default router;

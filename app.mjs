@@ -10,6 +10,10 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
+import authRoutes from "./Handlers/Users/auth.mjs";
+import userRoutes from "./Handlers/Users/users.mjs";
+import cardRoutes from "./Handlers/Cards/cards.mjs";
+
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
@@ -117,6 +121,11 @@ app.use((req, res, next) => {
 });
 
 
-import("./Handlers/Users/auth.mjs");
-import("./Handlers/Users/users.mjs");
-import("./Handlers/Cards/cards.mjs");
+// import("./Handlers/Users/auth.mjs");
+// import("./Handlers/Users/users.mjs");
+// import("./Handlers/Cards/cards.mjs");
+
+
+app.use('/', authRoutes);   // All auth-related routes
+app.use('/', userRoutes);  // All user-related routes
+app.use('/', cardRoutes);  // All card-related routes

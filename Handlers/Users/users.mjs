@@ -1,12 +1,15 @@
 import { app } from "../../app.mjs";
 import { adminGuard } from "../../guard.mjs";
 import { User } from "./usersTemplate.mjs";
+import express from "express";
 
-app.get("/users", adminGuard, async (req, res) => {
+const router = express.Router();
+
+router.get("/users", adminGuard, async (req, res) => {
     res.send(await User.find());
 });
 
-app.get("/users/:id", adminGuard, async (req, res) => {
+router.get("/users/:id", adminGuard, async (req, res) => {
     const user = await User.findOne({ _id: req.params.id }, '-password');
     const reqUser = req.user;
 
@@ -18,7 +21,7 @@ app.get("/users/:id", adminGuard, async (req, res) => {
 });
 
 // Edit user info (PUT)
-app.put("/users/:id", async (req, res) => {
+router.put("/users/:id", async (req, res) => {
     const {
         name: { firstName, middleName, lastName },
         phone,
@@ -64,12 +67,12 @@ app.put("/users/:id", async (req, res) => {
     res.send(user);
 });
 
-app.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id", async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.end();
 });
 
-app.patch("/users/:id", async (req, res) => {
+router.patch("/users/:id", async (req, res) => {
     try {
         const currentUser = await User.findById(req.params.id);
         if (!currentUser) {
@@ -93,3 +96,5 @@ app.patch("/users/:id", async (req, res) => {
         return res.status(403).send({ message: "User not found" });
     }
 });
+
+export default router;
