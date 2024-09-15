@@ -35,11 +35,9 @@ const cardSchema = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-// Function to validate required fields
 function validateRequiredFields(data) {
     const errors = [];
 
-    // Check for missing fields in the card schema
     if (!data.title) errors.push("title");
     if (!data.subtitle) errors.push("subtitle");
     if (!data.description) errors.push("description");
@@ -47,12 +45,10 @@ function validateRequiredFields(data) {
     if (!data.email) errors.push("email");
     if (!data.web) errors.push("web");
 
-    // Check if image fields are provided
     if (!data.image || !data.image.url || !data.image.alt) {
         errors.push("image fields (url, alt)");
     }
 
-    // Check if address fields are provided
     if (!data.address) {
         errors.push("address");
     } else {
@@ -67,12 +63,10 @@ function validateRequiredFields(data) {
     if (!data.bizNumber) errors.push("bizNumber");
     if (!data.createdByUserId) errors.push("createdByUserId");
 
-    // Return error if any fields are missing
     if (errors.length > 0) {
         return `Missing required fields: ${errors.join(", ")}`;
     }
 
-    // Return null if no errors
     return null;
 }
 

@@ -14,14 +14,13 @@ import authRoutes from "./Handlers/Users/auth.mjs";
 import userRoutes from "./Handlers/Users/users.mjs";
 import cardRoutes from "./Handlers/Cards/cards.mjs";
 
-const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
-const __dirname = path.dirname(__filename); // get the name of the directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
 const PORT = process.env.PORT;
 
-// Initialize MongoDB connection
 async function main() {
     await mongoose.connect(process.env.DB_URL);
     console.log('MongoDB connection established on port 27017');
@@ -32,7 +31,12 @@ main().catch(err => console.log(err));
 
 export const app = express();
 
-// Setup request logging using Morgan with chalk for colorization
+app.get('/', (req, res) => {
+    res.send({
+        message: "Welcome to Ryan's MongoDB project!",
+    });
+});
+
 app.use(morgan((tokens, req, res) => {
     const status = tokens.status(req, res);
     const method = tokens.method(req, res);
@@ -55,10 +59,8 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ');
 }));
 
-// Middleware for JSON body parsing
 app.use(express.json());
 
-// Session management
 app.use(session({
     secret: 'cat',
     name: 'full-stack-session',
@@ -66,7 +68,6 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-// CORS settings
 app.use(cors({
     origin: true,
     credentials: true,
@@ -74,26 +75,22 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Accept, Authorization',
 }));
 
-// API Endpoints
-app.use('/', authRoutes);   // Auth-related routes
-app.use('/', userRoutes);   // User-related routes
-app.use('/', cardRoutes);   // Card-related routes
 
-// Serve static files from 'public' folder when no API matches
+app.use('/', authRoutes);
+app.use('/', userRoutes);
+app.use('/', cardRoutes);
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Handle API and static file requests
+
 app.use((req, res, next) => {
-    // If no route matches, check for static files
     const filePath = path.join(__dirname, 'public', req.url);
 
-    // Check if the requested file exists
     fs.access(filePath, fs.constants.F_OK, (err) => {
         if (!err) {
-            // If the file exists, serve it
             res.sendFile(filePath);
         } else {
-            // If file does not exist, return 404
             res.status(404).send({
                 error: "Not Found",
                 message: "The requested resource was not found on this server."
@@ -102,7 +99,7 @@ app.use((req, res, next) => {
     });
 });
 
-// Start the server
+
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });

@@ -1,5 +1,5 @@
 import { app } from "../../app.mjs";
-import { adminGuard } from "../../guard.mjs";
+import { adminGuard, deleteGuard } from "../../guard.mjs";
 import { User } from "./usersTemplate.mjs";
 import express from "express";
 
@@ -10,17 +10,21 @@ router.get("/users", adminGuard, async (req, res) => {
 });
 
 router.get("/users/:id", adminGuard, async (req, res) => {
-    const user = await User.findOne({ _id: req.params.id }, '-password');
-    const reqUser = req.user;
+    try {
+        const user = await User.findOne({ _id: req.params.id }, '-password');
+        const reqUser = req.user;
 
-    if (!user) {
+        if (!user) {
+            return res.status(403).send({ message: "User not found" });
+        }
+        const data = { message: `Hello ${reqUser.name.firstName}`, data: user };
+        res.send(data);
+    }
+    catch (error) {
         return res.status(403).send({ message: "User not found" });
     }
-    const data = { message: `Hello ${reqUser.name.firstName}`, data: user };
-    res.send(data);
 });
 
-// Edit user info (PUT)
 router.put("/users/:id", async (req, res) => {
     const {
         name: { firstName, middleName, lastName },
@@ -67,7 +71,7 @@ router.put("/users/:id", async (req, res) => {
     res.send(user);
 });
 
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id", deleteGuard, async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.end();
 });

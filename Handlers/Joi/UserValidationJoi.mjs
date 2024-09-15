@@ -7,9 +7,8 @@ export const HTTPS_REGEX = /^https:\/\/.+$/;
 export const PASSWORD_REGEX = /^(?=(?:.*[A-Z]){3})(?=(?:.*[a-z]){3})(?=(?:.*\d){1})(?=(?:.*[!@#$%^&*]){1}).*$/;  // at least 3 uppercase, 3 lowercase, 1 number, 1 special character
 
 const objectIdValidation = (value, helpers) => {
-    // Check if the value is an instance of mongoose.Types.ObjectId
     if (!(value instanceof mongoose.Types.ObjectId)) {
-        return helpers.error('any.invalid'); // Custom error message
+        return helpers.error('any.invalid');
     }
     return value;
 };
@@ -54,7 +53,7 @@ export const cardValidationCreationJoi = Joi.object({
     title: Joi.string().min(2).max(30).required(),
     subtitle: Joi.string().min(2).max(30).required(),
     description: Joi.string().min(2).max(60).required(),
-    phone: Joi.string().pattern(/^[+]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/).required(),  // Matches various phone number formats
+    phone: Joi.string().pattern(/^[+]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/).required(),
     email: Joi.string().email().required(),
     web: Joi.string().uri({ scheme: ['https'] }).required(),
 
@@ -81,7 +80,7 @@ export const cardValidationEditJoi = Joi.object({
     title: Joi.string().min(2).max(30).optional(),
     subtitle: Joi.string().min(2).max(30).optional(),
     description: Joi.string().min(2).max(60).optional(),
-    phone: Joi.string().pattern(/^[+]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/).optional(),  // Matches various phone number formats
+    phone: Joi.string().pattern(/^[+]*[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/).optional(),
     email: Joi.string().email().optional(),
     web: Joi.string().uri({ scheme: ['https'] }).optional(),
 

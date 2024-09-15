@@ -69,15 +69,12 @@ router.post("/signup", async (req, res) => {
     if (!EMAIL_REGEX.test(email)) {
         return res.status(400).send("Invalid email");
     }
-    // Check if password is valid
     if (!PASSWORD_REGEX.test(password)) {
         return res.status(400).send("Invalid password");
     }
-    // Check if web is valid
     if (!HTTPS_REGEX.test(web)) {
         return res.status(400).send("Invalid web");
     }
-    // Check if email is already in use
     if (await User.findOne({ email })) {
         return res.status(403).send("Email already in use");
     }
