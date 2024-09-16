@@ -11,7 +11,7 @@ import express from "express";
 const router = express.Router()
 
 
-router.post("/login", async (req, res) => {
+router.post("/users/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -36,7 +36,7 @@ router.post("/login", async (req, res) => {
     res.send(token);
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/users", async (req, res) => {
     const validate = UserValidationJoi.validate(req.body, { allowUnknown: false });
 
     if (validate.error) {
